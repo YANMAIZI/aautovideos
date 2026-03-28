@@ -300,6 +300,31 @@ SUBTITLE_PRESETS = {
         "alignment": 2,
         "remove_punctuation": True,
         "rgb_mode": True
+    },
+
+    "RGB Neon Pro": {
+        "font_name": "Montserrat-ExtraBold",
+        "font_size": 36,
+        "base_color": "RGB",
+        "highlight_color": "RGB",
+        "outline_color": "#101010",
+        "outline_thickness": 2,
+        "shadow_color": "#000000",
+        "shadow_size": 4,
+        "bold": True,
+        "italic": False,
+        "uppercase": True,
+        "highlight_size": 44,
+        "words_per_block": 2,
+        "gap_limit": 0.25,
+        "mode": "highlight",
+        "underline": False,
+        "strikeout": False,
+        "border_style": 1,
+        "vertical_position": 185,
+        "alignment": 2,
+        "remove_punctuation": True,
+        "rgb_mode": True
     }
 }
 
@@ -400,7 +425,13 @@ def generate_preview_html(font, size, color, highlight, outline, outline_thick, 
         83%  { color: #8000ff; }
         100% { color: #ff0080; }
     }
-    .rgb-text { animation: rgbFlow 1.5s linear infinite; }
+    .rgb-text {
+        animation: rgbFlow 1.5s linear infinite;
+        text-shadow:
+          0 0 5px rgba(255,0,128,0.9),
+          0 0 10px rgba(0,255,255,0.8),
+          0 0 16px rgba(128,0,255,0.6);
+    }
     .rgb-text-highlight { animation: rgbFlow 1.5s linear infinite 0.5s; font-size: """ + str(int(highlight_preview_px)) + """px; }
     </style>"""
         rgb_span_extra = " rgb-text"
@@ -571,7 +602,16 @@ def render_preview_video(font, size, color, highlight, outline, outline_thick, s
             out_vid_path
         ]
 
-        subprocess.run(cmd, cwd=WORKING_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        run_result = subprocess.run(
+            cmd,
+            cwd=WORKING_DIR,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+            timeout=25
+        )
+        if run_result.returncode != 0:
+            return gr.update(value=None)
         
         if os.path.exists(out_vid_path):
             import shutil
