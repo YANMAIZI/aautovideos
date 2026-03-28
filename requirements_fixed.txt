@@ -1,0 +1,33 @@
+# ViralCutter - requirements_fixed.txt
+# Используйте INSTALL.bat вместо pip install -r напрямую
+# INSTALL.bat устанавливает пакеты с правильной обработкой ошибок
+
+# ---- БАЗОВЫЕ (обязательные) ----
+yt-dlp
+ffmpeg-python
+numpy
+tqdm
+psutil
+deep-translator
+gradio
+fastapi
+uvicorn
+opencv-python
+google-genai
+
+# ---- GPT4Free ----
+# g4f[all]    # Используйте INSTALL.bat — он обрабатывает ошибки установки
+g4f
+
+# ---- PyTorch (устанавливайте через INSTALL.bat для правильного выбора CUDA/CPU) ----
+# torch       # INSTALL.bat выбирает CUDA или CPU автоматически
+
+# ---- AI/ML (требуют Python 3.10-3.12, могут не работать на 3.14) ----
+# whisperx
+# mediapipe
+# insightface
+# onnxruntime
+
+# ---- Локальные LLM (опционально, требует CUDA 12.4) ----
+# --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
+# llama-cpp-python
