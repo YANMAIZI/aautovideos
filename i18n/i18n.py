@@ -27,16 +27,17 @@ class I18nAuto:
             except Exception:
                 language = None
 
-        # Fallback chain: exact match -> language only (e.g. 'ru') -> en_US
-        candidate = language or "en_US"
+        # Fallback chain: exact match -> language only (e.g. 'ru') -> ru_RU
+        # Project default is Russian for a fully localized UX out of the box.
+        candidate = language or "ru_RU"
         if not self._locale_exists(candidate):
             # Try just the language prefix: ru_RU -> ru (won't exist, but pattern)
             short = candidate.split("_")[0] if candidate else "en"
             # Try common mappings
             lang_map = {"ru": "ru_RU", "pt": "pt_BR", "en": "en_US"}
-            candidate = lang_map.get(short, "en_US")
+            candidate = lang_map.get(short, "ru_RU")
             if not self._locale_exists(candidate):
-                candidate = "en_US"
+                candidate = "ru_RU"
 
         self.language = candidate
         self.language_map = load_language_list(candidate)

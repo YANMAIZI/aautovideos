@@ -111,10 +111,19 @@ def generate_ass_from_file(input_path, output_path, project_folder,
         print(f"[ERROR] Loading JSON {input_path}: {e}")
         return
 
-    # 4. Detect RGB mode
+    # 4. Normalize mode aliases for better stability across older configs.
+    mode_aliases = {
+        "palavra_por_palavra": "word_by_word",
+        "wordbyword": "word_by_word",
+        "sem_higlight": "no_highlight",
+        "sem_highlight": "no_highlight",
+    }
+    mode = mode_aliases.get(str(mode).strip().lower(), mode)
+
+    # 5. Detect RGB mode
     _rgb_active = rgb_mode or str(base_color).upper() in ("RGB", "RAINBOW", "&HRGB&")
 
-    # 5. Prepare colours for header
+    # 6. Prepare colours for header
     if _rgb_active:
         _hdr_r, _hdr_g, _hdr_b = hue_to_rgb(0)
         _hdr_color = rgb_to_ass_color(_hdr_r, _hdr_g, _hdr_b)
@@ -125,7 +134,7 @@ def generate_ass_from_file(input_path, output_path, project_folder,
     _out_c = outline_color if str(outline_color).startswith("&H") else "&H00000000&"
     _shd_c = shadow_color if str(shadow_color).startswith("&H") else "&H00000000&"
 
-    # 6. Write ASS header
+    # 7. Write ASS header
     header_ass = f"""[Script Info]
 Title: ViralCutter Subtitles
 ScriptType: v4.00+
@@ -217,6 +226,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                         start_sec = last_end_time
                     if end_sec <= start_sec:
                         end_sec = start_sec + 0.15
+                    # Keep subtitle durations readable and stable.
+                    end_sec = max(end_sec, start_sec + 0.08)
+                    end_sec = min(end_sec, start_sec + 5.0)
 
                     start_time_ass = format_time_ass(start_sec)
                     end_time_ass = format_time_ass(end_sec)
@@ -255,7 +267,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                                     parts.append(f"{{\\fs{base_size}\\c{_hdr_color}}}{wd['word']} ")
                             line = "".join(parts).strip()
 
-                    elif mode in ("no_highlight", "sem_higlight"):
+                    elif mode == "no_highlight":
                         if _rgb_active:
                             h_off = (start_sec * 60 + word_global_index * 30) % 360
                             r1,g1,b1 = hue_to_rgb(h_off)
@@ -267,7 +279,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                         else:
                             line = " ".join(wd['word'] for wd in block).strip()
 
-                    elif mode == "palavra_por_palavra":
+                    elif mode == "word_by_word":
                         word_text = block[j]['word'].strip()
                         if _rgb_active:
                             h_off = (start_sec * 60 + word_global_index * 50 + j * 72) % 360
